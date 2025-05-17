@@ -1,0 +1,5 @@
+/# Ignore database file
+/AI-cessible-server/db.sqlite
+
+# Ignore node modules in frontend
+/frontend/node_modules

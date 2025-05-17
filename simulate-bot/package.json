@@ -1,0 +1,22 @@
+{
+  "name": "simulate-bot",
+  "version": "1.0.0",
+  "description": "Bot simulation for AI-cessible Airline Shopping",
+  "main": "index.js",
+  "scripts": {
+    "bot": "node bot.js",
+    "comparison": "node comparison-bot.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "bot",
+    "simulation",
+    "airline",
+    "playwright"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "playwright": "^1.42.1"
+  }
+}

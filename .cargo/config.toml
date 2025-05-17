@@ -1,0 +1,4 @@
+[env]
+# Direct all build scripts to use local tmp directory instead of system temp
+TMPDIR = "tmp"
+SQLITE_TMPDIR = "tmp"
