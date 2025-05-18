@@ -5,15 +5,12 @@ const BASE_URL = 'http://localhost:8000';
 async function runL2Bot() {
   console.log('Starting L2 API bot...');
   const browser = await chromium.launch({ headless: false });
-  const context = await browser.newContext({
-    // Include "bot" in the User-Agent so the detection script can pick it up
-    userAgent: 'PlaywrightBot/1.0',
-    viewport: { width: 1280, height: 720 }
-  });
+  const context = await browser.newContext();
 
   await context.setExtraHTTPHeaders({
     'X-Bot-Confidence': '0.98',
-    'X-User-Agent-Type': 'bot'
+    'X-User-Agent-Type': 'bot',
+    'User-Agent': 'L2BotDemo/1.0'
   });
 
   const page = await context.newPage();
