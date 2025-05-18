@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use super::schema::{QueryRoot, MutationRoot, FlightOffer};
-    use super::bot_schema::{BotQueryRoot, BotMutationRoot};
-    use super::bot_detection::BotInfo;
+    use crate::schema::{QueryRoot, MutationRoot, FlightOffer};
+    use crate::bot_schema::{BotQueryRoot, BotMutationRoot};
+    use crate::bot_detection::BotInfo;
     use async_graphql::{Schema, Request};
     use sqlx::SqlitePool;
 
