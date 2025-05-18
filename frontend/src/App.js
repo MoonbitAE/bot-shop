@@ -36,6 +36,7 @@ const authLink = setContext((_, { headers }) => {
       ...headers,
       'X-Bot-Confidence': botConfidenceScore.toFixed(2),
       'X-User-Agent-Type': isBot ? 'bot' : 'human',
+      'X-Bot-Intelligence': botDetector.getIntelligenceLevel(),
     }
   };
 });

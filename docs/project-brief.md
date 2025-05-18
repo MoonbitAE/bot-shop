@@ -66,6 +66,15 @@ Implemented via middleware and GraphQL extensions:
 
 Output: Bot-Confidence Score → Used to route to bot/human API variants.
 
+### Bot Intelligence Classification
+
+The client derives an intelligence level from the bot score, navigation patterns,
+and use of bot-only endpoints (`/bot/submitIntent`, `/bot/requestExplanation`, etc.).
+
+- **L0** – low score and no bot API usage.
+- **L1** – moderate score or minimal bot API calls.
+- **L2** – high score with repeated bot endpoint usage.
+
 ---
 
 ## Development Phases
