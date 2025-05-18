@@ -240,3 +240,6 @@ async fn graphql_playground() -> impl IntoResponse {
     Html(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
 }
 
+
+#[cfg(test)]
+mod tests;

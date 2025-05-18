@@ -1,0 +1,53 @@
+openapi: 3.0.3
+info:
+  title: AI-cessible Server API
+  version: 1.0.0
+paths:
+  /graphql:
+    post:
+      summary: Execute GraphQL operations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: GraphQL response
+          content:
+            application/json:
+              schema:
+                type: object
+  /bot/graphql:
+    post:
+      summary: Execute bot-optimized GraphQL operations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: GraphQL response for bots
+          content:
+            application/json:
+              schema:
+                type: object
+  /bot/behaviorMetrics:
+    post:
+      summary: Submit client-side behavior metrics
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Metrics accepted
+          content:
+            application/json:
+              schema:
+                type: object
