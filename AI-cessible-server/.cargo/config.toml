@@ -1,0 +1,4 @@
+[env]
+# Ensure SQLite and other temp files use local tmp directory during build/test
+TMPDIR = "tmp"
+SQLITE_TMPDIR = "tmp"
