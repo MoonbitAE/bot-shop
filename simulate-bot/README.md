@@ -58,6 +58,16 @@ This script demonstrates an intelligence level 2 bot. It detects the hidden
 `bot-api-endpoint` meta tag, then queries the `/bot/graphql` API directly to
 retrieve flight data.
 
+### L2 Comparison Bot
+
+```bash
+npm run comparison-l2
+```
+
+This variant combines the comparison features with the L2 API access.
+It uses the discovered endpoint for all flight searches and reports a
+`comparison_search` intent to the server.
+
 ## Bot Detection Features
 
 The simulations include bot detection triggers such as:

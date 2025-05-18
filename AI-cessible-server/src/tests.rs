@@ -46,6 +46,22 @@ mod tests {
         .await
         .unwrap();
 
+        sqlx::query(
+            r#"CREATE TABLE bot_intents (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                agent_type TEXT NOT NULL,
+                confidence REAL NOT NULL,
+                intent_type TEXT NOT NULL,
+                query_params TEXT,
+                reason TEXT,
+                additional_context TEXT,
+                recorded_time TEXT NOT NULL
+            );"#,
+        )
+        .execute(&pool)
+        .await
+        .unwrap();
+
         let schema = Schema::build(QueryRoot, MutationRoot, async_graphql::EmptySubscription)
             .data(pool.clone())
             .finish();

@@ -14,6 +14,19 @@ pub struct BotIntent {
     pub additional_context: Option<serde_json::Value>,
 }
 
+/// Bot intent record stored in the database
+#[derive(sqlx::FromRow, Serialize)]
+pub struct BotIntentRecord {
+    pub id: i64,
+    pub agent_type: String,
+    pub confidence: f32,
+    pub intent_type: String,
+    pub query_params: Option<String>,
+    pub reason: Option<String>,
+    pub additional_context: Option<String>,
+    pub recorded_time: String,
+}
+
 /// Explanation for a flight offer
 #[derive(SimpleObject, Serialize)]
 pub struct OfferExplanation {
