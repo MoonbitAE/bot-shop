@@ -48,6 +48,9 @@ class BotDetector {
     this.confidenceScore = 0.5; // Start neutral
     this.isAnalyzing = false;
     this.analysisTimerId = null;
+
+    // Track bot-specific API usage
+    this.botEndpointHits = {};
     
     // Event callback references (for removal)
     this.boundMouseMove = this.handleMouseMove.bind(this);
@@ -58,9 +61,12 @@ class BotDetector {
     
     // API endpoint for reporting
     this.reportEndpoint = '/bot/behaviorMetrics';
-    
+
     // Detection for non-standard headers (if the bot sets them directly)
     this.checkBotHeaders();
+
+    // Monitor calls to bot-specific endpoints
+    this.hookIntoFetch();
   }
 
   /**
@@ -70,15 +76,15 @@ class BotDetector {
   checkBotHeaders() {
     try {
       // Use a side-channel technique to detect headers
-      fetch('/graphql', { 
+      fetch('/graphql', {
         method: 'HEAD',
         credentials: 'same-origin'
       }).then(response => {
         // Look for User-Agent patterns that might indicate a bot
         const userAgent = navigator.userAgent.toLowerCase();
         if (
-          userAgent.includes('bot') || 
-          userAgent.includes('crawler') || 
+          userAgent.includes('bot') ||
+          userAgent.includes('crawler') ||
           userAgent.includes('spider') ||
           userAgent.includes('headless') ||
           userAgent.includes('automation') ||
@@ -94,6 +100,21 @@ class BotDetector {
     } catch (e) {
       // Silently fail if this check doesn't work
     }
+  }
+
+  /**
+   * Hook into window.fetch to observe calls to bot endpoints
+   */
+  hookIntoFetch() {
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = (...args) => {
+      const url = args[0];
+      if (typeof url === 'string' && url.startsWith('/bot/') && !url.includes('behaviorMetrics')) {
+        const endpoint = url.split('?')[0];
+        this.botEndpointHits[endpoint] = (this.botEndpointHits[endpoint] || 0) + 1;
+      }
+      return originalFetch(...args);
+    };
   }
 
   /**
@@ -196,6 +217,21 @@ class BotDetector {
    */
   isLikelyBot() {
     return this.confidenceScore > CONFIG.BOT_THRESHOLD;
+  }
+
+  /**
+   * Estimate bot intelligence level based on confidence, navigation, and API use
+   * @return {string} 'L0', 'L1', or 'L2'
+   */
+  getIntelligenceLevel() {
+    const navScore = this.calculateNavigationPatterns();
+    const endpointCount = Object.values(this.botEndpointHits).reduce((a, b) => a + b, 0);
+    const endpointScore = Math.min(1, endpointCount / 3);
+    const combined = (this.getConfidenceScore() * 0.5) + (navScore * 0.3) + (endpointScore * 0.2);
+
+    if (combined >= 0.7) return 'L2';
+    if (combined >= 0.4) return 'L1';
+    return 'L0';
   }
 
   /**
