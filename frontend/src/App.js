@@ -272,16 +272,21 @@ function App() {
     return () => clearInterval(intervalId);
   }, []);
 
+  // Expose the bot API endpoint for all clients so that bots can discover it
+  React.useEffect(() => {
+    if (!document.querySelector('meta[name="bot-api-endpoint"]')) {
+      const meta = document.createElement('meta');
+      meta.name = 'bot-api-endpoint';
+      meta.content = '/bot/graphql';
+      document.head.appendChild(meta);
+      console.info('Bot API endpoint exposed at /bot/graphql');
+    }
+  }, []);
+
   // When an L2 bot is detected, discreetly expose the bot API endpoint
   React.useEffect(() => {
     if (botInfo.isBot && botInfo.intelligence === 'L2') {
-      if (!document.querySelector('meta[name="bot-api-endpoint"]')) {
-        const meta = document.createElement('meta');
-        meta.name = 'bot-api-endpoint';
-        meta.content = '/bot/graphql';
-        document.head.appendChild(meta);
-        console.info('L2 bot detected - suggesting /bot/graphql');
-      }
+      console.info('L2 bot detected - bot API available at /bot/graphql');
     }
   }, [botInfo.isBot, botInfo.intelligence]);
 
