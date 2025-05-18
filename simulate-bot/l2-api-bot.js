@@ -16,6 +16,9 @@ async function runL2Bot() {
   const page = await context.newPage();
   await page.goto(BASE_URL);
 
+  // Give the page time to run bot detection and expose the meta tag
+  await page.waitForSelector('meta[name="bot-api-endpoint"]', { timeout: 10000 }).catch(() => null);
+
   const apiEndpoint = await page.evaluate(() => {
     const meta = document.querySelector('meta[name="bot-api-endpoint"]');
     return meta ? meta.content : null;
