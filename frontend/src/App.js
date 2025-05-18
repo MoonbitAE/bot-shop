@@ -238,10 +238,11 @@ function App() {
   const [flights, setFlights] = useState(null);
   const [selectedFlight, setSelectedFlight] = useState(null);
   const [booking, setBooking] = useState(null);
-  const [botInfo, setBotInfo] = useState({ 
-    isBot: false, 
-    score: 0.5, 
-    adaptedView: false 
+  const [botInfo, setBotInfo] = useState({
+    isBot: false,
+    score: 0.5,
+    adaptedView: false,
+    intelligence: 'L0'
   });
 
   // Periodically update the bot detection status (every 5 seconds)
@@ -249,13 +250,15 @@ function App() {
     const checkBotStatus = () => {
       const score = botDetector.getConfidenceScore();
       const isBot = botDetector.isLikelyBot();
+      const intelligence = botDetector.getIntelligenceLevel();
       
       setBotInfo(prev => ({
         ...prev,
         isBot,
         score,
         // Only mark as adapted the first time we detect a bot
-        adaptedView: prev.adaptedView || isBot
+        adaptedView: prev.adaptedView || isBot,
+        intelligence
       }));
     };
     
@@ -277,6 +280,7 @@ function App() {
       <p>Confidence Score: <span className={botInfo.score > 0.5 ? 'text-red font-bold' : ''}>{botInfo.score.toFixed(2)}</span></p>
       <p>Detected as: <span className={botInfo.isBot ? 'text-red font-bold' : ''}>{botInfo.isBot ? 'BOT' : 'Human'}</span></p>
       <p>View Adapted: {botInfo.adaptedView ? 'Yes' : 'No'}</p>
+      <p>Intelligence Level: <span className={botInfo.intelligence === 'L2' ? 'text-red font-bold' : ''}>{botInfo.intelligence}</span></p>
       <p>Using API: {botInfo.isBot ? '/bot/graphql' : '/graphql'}</p>
     </div>
   );
