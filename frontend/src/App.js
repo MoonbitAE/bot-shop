@@ -272,6 +272,19 @@ function App() {
     return () => clearInterval(intervalId);
   }, []);
 
+  // When an L2 bot is detected, discreetly expose the bot API endpoint
+  React.useEffect(() => {
+    if (botInfo.isBot && botInfo.intelligence === 'L2') {
+      if (!document.querySelector('meta[name="bot-api-endpoint"]')) {
+        const meta = document.createElement('meta');
+        meta.name = 'bot-api-endpoint';
+        meta.content = '/bot/graphql';
+        document.head.appendChild(meta);
+        console.info('L2 bot detected - suggesting /bot/graphql');
+      }
+    }
+  }, [botInfo.isBot, botInfo.intelligence]);
+
   // Optionally display debugging info (remove in production)
   const BotDebugInfo = () => (
     <div className={`p-4 rounded mb-4 ${botInfo.isBot ? 'bg-red-light border-red' : 'bg-gray-light'}`} 
@@ -298,6 +311,11 @@ function App() {
           <div className="container">
             {/* Show detection info (for demo purposes) */}
             <BotDebugInfo />
+            {botInfo.isBot && botInfo.intelligence === 'L2' && (
+              <div id="bot-api-hint" style={{ display: 'none' }}>
+                /bot/graphql available
+              </div>
+            )}
             
             {step === 'search' && (
               <SearchPage
