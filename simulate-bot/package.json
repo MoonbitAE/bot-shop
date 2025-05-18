@@ -6,6 +6,7 @@
   "scripts": {
     "bot": "node bot.js",
     "comparison": "node comparison-bot.js",
+    "comparison-l2": "node comparison-bot-l2.js",
     "l2": "node l2-api-bot.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

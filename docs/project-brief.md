@@ -31,7 +31,7 @@ Demonstrate a next-generation airline e-commerce platform designed to **optimize
 
 ### AI-Cessible (Bot-Specific) APIs
 Isolated via path prefix `/bot/graphql` and IP/user-agent based routing:
-- `bot/submitIntent`: logs search, rejection, booking logic.
+- `bot/intent`: POST to record bot intent, GET to retrieve saved intents.
 - `bot/requestExplanation`: returns structured JSON explanations of offers.
 - `bot/offerInsights`: returns comparative reasoning metadata (e.g., seat pitch, cancellation risk).
 - `bot/negotiation`: optional endpoint to simulate future incentive logic.

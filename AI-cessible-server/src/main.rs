@@ -81,6 +81,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     .execute(&pool)
     .await?;
 
+    sqlx::query(
+        r#"
+        CREATE TABLE IF NOT EXISTS bot_intents (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            agent_type TEXT NOT NULL,
+            confidence REAL NOT NULL,
+            intent_type TEXT NOT NULL,
+            query_params TEXT,
+            reason TEXT,
+            additional_context TEXT,
+            recorded_time TEXT NOT NULL
+        );
+        "#,
+    )
+    .execute(&pool)
+    .await?;
+
     // Seed flight data if empty
     let count: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM flights")
         .fetch_one(&pool)
@@ -126,6 +143,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/graphql", get(graphql_playground).post(graphql_handler))
         // Bot-specific GraphQL endpoint
         .route("/bot/graphql", post(bot_graphql_handler))
+        // Bot intent endpoint
+        .route("/bot/intent", post(intent_handler).get(list_intents_handler))
         // Behavior metrics endpoint for client-side tracking
         .route("/bot/behaviorMetrics", post(behavior_metrics_handler))
         // Serve the React app entrypoint
@@ -137,6 +156,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Add schema data to all routes
         .layer(Extension(schema))
         .layer(Extension(bot_schema))
+        .layer(Extension(pool.clone()))
         // Add tracing layer
         .layer(TraceLayer::new_for_http());
 
@@ -233,6 +253,54 @@ async fn behavior_metrics_handler(
     
     // Simply acknowledge receipt
     StatusCode::OK
+}
+
+/// Handler for explicit bot intent
+async fn intent_handler(
+    bot_info: Option<Extension<BotInfo>>,
+    Extension(pool): Extension<SqlitePool>,
+    Json(intent): Json<crate::bot_schema::BotIntent>,
+) -> impl IntoResponse {
+    let (agent_type, confidence) = if let Some(Extension(info)) = bot_info {
+        info!(
+            "Bot intent: agent={}, confidence={}, intent={:?}",
+            info.agent_type,
+            info.confidence_score,
+            intent
+        );
+        (info.agent_type.clone(), info.confidence_score)
+    } else {
+        info!("Bot intent from unknown agent: {:?}", intent);
+        ("unknown".to_string(), 0.0)
+    };
+
+    let _ = sqlx::query(
+        "INSERT INTO bot_intents (agent_type, confidence, intent_type, query_params, reason, additional_context, recorded_time) VALUES (?,?,?,?,?,?,datetime('now'))"
+    )
+    .bind(agent_type)
+    .bind(confidence)
+    .bind(&intent.intent_type)
+    .bind(intent.query_params.as_ref().map(|v| v.to_string()))
+    .bind(&intent.reason)
+    .bind(intent.additional_context.as_ref().map(|v| v.to_string()))
+    .execute(&pool)
+    .await;
+
+    StatusCode::OK
+}
+
+/// Retrieve stored bot intents
+async fn list_intents_handler(
+    Extension(pool): Extension<SqlitePool>,
+) -> impl IntoResponse {
+    let rows = sqlx::query_as::<_, crate::bot_schema::BotIntentRecord>(
+        "SELECT id, agent_type, confidence, intent_type, query_params, reason, additional_context, recorded_time FROM bot_intents ORDER BY id DESC"
+    )
+    .fetch_all(&pool)
+    .await
+    .unwrap_or_default();
+
+    Json(rows)
 }
 
 /// GraphQL playground endpoint for human users
