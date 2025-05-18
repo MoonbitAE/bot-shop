@@ -95,4 +95,24 @@ mod tests {
         let price = response.into_json().unwrap()["buildOffer"]["totalPrice"].as_f64().unwrap();
         assert!(price > 0.0);
     }
+
+    #[tokio::test]
+    async fn test_bot_search_flights() {
+        let (_pool, _schema, bot_schema) = setup_schema().await;
+        let request = Request::new("{ searchFlights(origin: \"NYC\", destination: \"LAX\", dates: []) { id } }");
+        let response = bot_schema.execute(request).await.data;
+        let list = response.into_json().unwrap()["searchFlights"].as_array().unwrap().clone();
+        assert!(!list.is_empty());
+    }
+
+    #[tokio::test]
+    async fn test_request_explanation() {
+        let (_pool, _schema, bot_schema) = setup_schema().await;
+        let query = "{ requestExplanation(flightId: 1) { flightId baseFare } }";
+        let request = Request::new(query);
+        let response = bot_schema.execute(request).await.data;
+        let explanation = response.into_json().unwrap()["requestExplanation"].clone();
+        let base_fare = explanation["baseFare"].as_f64().unwrap();
+        assert!(base_fare > 0.0);
+    }
 }
