@@ -48,6 +48,16 @@ This more advanced bot will:
 - Generate a comparison table
 - Output results to the console and a text file
 
+### L2 API Bot
+
+```bash
+npm run l2
+```
+
+This script demonstrates an intelligence level 2 bot. It detects the hidden
+`bot-api-endpoint` meta tag, then queries the `/bot/graphql` API directly to
+retrieve flight data.
+
 ## Bot Detection Features
 
 The simulations include bot detection triggers such as:
